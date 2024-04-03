@@ -1,0 +1,1 @@
+(Ayush) Theme Customization - Front End: Allow users to personalize the game interface by choosing from different themes or color schemes. Provide a menu where users can select their preferred visual style, making the gaming experience more engaging.
