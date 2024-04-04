@@ -1,0 +1,3 @@
+[submodule "Task_3/gtkada"]
+	path = Task_3/gtkada
+	url = git@github.com:AdaCore/gtkada.git
