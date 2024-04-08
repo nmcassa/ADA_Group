@@ -7,8 +7,9 @@ procedure MAIN is
 	type Board is
       	 array (Index) of Character;
 
-	B : Board := ('b', 'b', 'b', 'a', 'a'
-			, 'a', 'l', 'l', 'l');
+	B : Board := ('-', '-', '-',
+			 '-', '-', '-',
+			 '-', '-', '-');
 
 	Temp1 : Integer;
 
@@ -24,6 +25,24 @@ procedure MAIN is
 		return 1;
 	end DisplayBoard;
 
+	function PlayMove(B : out Board; I : Index; Player : Character) return Integer
+	is
+	begin
+		-- Error Check if I is outside of 0 .. 8
+		B(I) := Player;
+		return 1;
+	end PlayMove;
+
 begin
+	--Inside of here we need to make game loop
+	--TODO
+	Temp1 := DisplayBoard(B);
+
+	Temp1 := PlayMove(B, 4, 'X');
+
+	Ada.Text_IO.New_Line;
+	Ada.Text_IO.Put("After Change");
+	Ada.Text_IO.New_Line;
+
 	Temp1 := DisplayBoard(B);
 end MAIN;
