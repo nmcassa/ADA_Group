@@ -1,7 +1,7 @@
 with Ada.Text_IO;
 use Ada.Text_IO;
 
-procedure MAIN is 
+procedure MAIN is
 	-- create an index for our board array from (0 - 8)
 	type Index is range 0 .. 8;
 	type Board is
@@ -10,8 +10,31 @@ procedure MAIN is
 	B : Board := ('-', '-', '-',
 			 '-', '-', '-',
 			 '-', '-', '-');
+	type IntroBoard is
+	 array (Index) of Integer;
+
+	Intro : IntroBoard := (0, 1, 2, 3, 4, 5, 6, 7, 8);
+ 
 
 	Temp1 : Integer;
+
+	Winner : Character;
+
+	function IntroPrint(Intro : IntroBoard) return Integer
+	is 
+	begin
+		Ada.Text_IO.Put("When prompted, select the space you want to make your move.");
+		Ada.Text_IO.New_Line;
+		for I in Index loop
+			if I = 3 or I = 6 then
+				Ada.Text_IO.New_Line; 
+			end if;	
+			Ada.Text_IO.Put(Integer'Image(Intro(I)));
+		end loop;
+		Ada.Text_IO.New_Line;
+		return 1;
+
+	end IntroPrint;
 
 	function DisplayBoard(B : Board) return Integer 
 	is
@@ -33,16 +56,52 @@ procedure MAIN is
 		return 1;
 	end PlayMove;
 
+	function GameLoop (B : out Board) return Character
+	is
+		looping : Integer;
+		Move : Index;
+		Temp : Integer;
+	begin
+		looping := 1;
+
+		Ada.Text_IO.New_Line;
+		Temp := DisplayBoard(B);
+		Ada.Text_IO.New_Line;
+	
+		while looping = 1 loop
+			-- PlayerX's move
+			Ada.Text_IO.New_Line;
+			Ada.Text_IO.Put("Player X Make a Move");
+
+			Move := Index'Value(Ada.Text_IO.Get_Line);			
+			Temp := PlayMove(B, Move, 'X');
+
+			Ada.Text_IO.New_Line;
+			Temp := DisplayBoard(B);
+			Ada.Text_IO.New_Line;
+
+			-- Check if X won
+			-- if X won, return X
+
+			-- PlayerO's move
+			Ada.Text_IO.New_Line;
+			Ada.Text_IO.Put("Player O Make a Move");
+
+			Move := Index'Value(Ada.Text_IO.Get_Line);			
+			Temp := PlayMove(B, Move, 'O');
+
+			Ada.Text_IO.New_Line;
+			Temp := DisplayBoard(B);
+			Ada.Text_IO.New_Line;
+
+			-- Check if O won
+
+		end loop;
+		return 'X';
+
+	end GameLoop;
+
 begin
-	--Inside of here we need to make game loop
-	--TODO
-	Temp1 := DisplayBoard(B);
-
-	Temp1 := PlayMove(B, 4, 'X');
-
-	Ada.Text_IO.New_Line;
-	Ada.Text_IO.Put("After Change");
-	Ada.Text_IO.New_Line;
-
-	Temp1 := DisplayBoard(B);
+	Temp1 := IntroPrint(Intro);
+	Winner := GameLoop(B);	
 end MAIN;
