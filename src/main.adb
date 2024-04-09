@@ -50,9 +50,19 @@ procedure MAIN is
 
 	function PlayMove(B : out Board; I : Index; Player : Character) return Integer
 	is
+		Temp : Integer;
+		New_Move : Index;
 	begin
 		-- Error Check if I is outside of 0 .. 8
-		B(I) := Player;
+		if B(I) = '-' then
+			B(I) := Player;
+			return 1;
+		end if;
+		Ada.Text_IO.New_Line;
+		Ada.Text_IO.Put("That space is already taken, select a new space: ");
+		New_Move := Index'Value(Ada.Text_IO.Get_Line);
+		Ada.Text_IO.New_Line;
+		Temp := PlayMove(B, New_Move, Player);
 		return 1;
 	end PlayMove;
 
@@ -71,7 +81,7 @@ procedure MAIN is
 		while looping = 1 loop
 			-- PlayerX's move
 			Ada.Text_IO.New_Line;
-			Ada.Text_IO.Put("Player X Make a Move");
+			Ada.Text_IO.Put("Player X Make a Move: ");
 
 			Move := Index'Value(Ada.Text_IO.Get_Line);			
 			Temp := PlayMove(B, Move, 'X');
@@ -85,7 +95,7 @@ procedure MAIN is
 
 			-- PlayerO's move
 			Ada.Text_IO.New_Line;
-			Ada.Text_IO.Put("Player O Make a Move");
+			Ada.Text_IO.Put("Player O Make a Move: ");
 
 			Move := Index'Value(Ada.Text_IO.Get_Line);			
 			Temp := PlayMove(B, Move, 'O');
