@@ -16,7 +16,7 @@ procedure MAIN is
 	Intro : IntroBoard := (0, 1, 2, 3, 4, 5, 6, 7, 8);
  
 
-	Temp1 : Integer;
+	Temp : Integer;
 
 	Winner : Character;
 
@@ -65,6 +65,43 @@ procedure MAIN is
 		Temp := PlayMove(B, New_Move, Player);
 		return 1;
 	end PlayMove;
+	
+	function CheckWin(B : Board; Player : Character) return Integer
+	is
+	begin
+		for I in 0 .. 2 loop
+			-- check rows
+			if B(Index(I * 3 + 0)) = Player and 
+			   B(Index(I * 3 + 1)) = Player and 
+			   B(Index(I * 3 + 2)) = Player then
+				return 1;
+			end if;
+			
+			-- check cols
+			if B(Index(0 * 3 + I)) = Player and
+			   B(Index(1 * 3 + I)) = Player and
+			   B(Index(2 * 3 + I)) = Player then
+				return 1;
+			end if;
+		end loop;
+
+		-- check diag
+		if B(Index(0)) = Player and
+		   B(Index(4)) = Player and
+		   B(Index(8)) = Player then
+			return 1;
+		end if;
+		
+		-- check other diag
+		if B(Index(2)) = Player and
+		   B(Index(4)) = Player and
+		   B(Index(6)) = Player then
+			return 1;
+		end if;
+
+		-- 0 if not winning board
+		return 0;
+	end CheckWin;
 
 	function GameLoop (B : out Board) return Character
 	is
@@ -92,6 +129,9 @@ procedure MAIN is
 
 			-- Check if X won
 			-- if X won, return X
+			if CheckWin(B, 'X') = 1 then
+				return 'X';	
+			end if;
 
 			-- PlayerO's move
 			Ada.Text_IO.New_Line;
@@ -99,6 +139,10 @@ procedure MAIN is
 
 			Move := Index'Value(Ada.Text_IO.Get_Line);			
 			Temp := PlayMove(B, Move, 'O');
+			
+			if CheckWin(B, 'O') = 1 then
+				return 'O';	
+			end if;
 
 			Ada.Text_IO.New_Line;
 			Temp := DisplayBoard(B);
@@ -112,6 +156,22 @@ procedure MAIN is
 	end GameLoop;
 
 begin
-	Temp1 := IntroPrint(Intro);
+	Temp := IntroPrint(Intro);
 	Winner := GameLoop(B);	
+
+	Ada.Text_IO.New_Line;
+	Temp := DisplayBoard(B);
+	Ada.Text_IO.New_Line;
+
+	if Winner = 'X' then
+		Ada.Text_IO.New_Line;
+		Ada.Text_IO.Put("Player X won the game!");
+		Ada.Text_IO.New_Line;
+	end if;
+
+	if Winner = 'O' then
+		Ada.Text_IO.New_Line;
+		Ada.Text_IO.Put("Player O won the game!");
+		Ada.Text_IO.New_Line;
+	end if;
 end MAIN;
