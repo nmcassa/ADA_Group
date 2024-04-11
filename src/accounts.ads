@@ -2,8 +2,6 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package accounts is
 
-   procedure saveData;
-
    type userDataArray is array (Integer range 1 .. 3) of Integer;
 
    function loadData (username : Unbounded_String; password : Unbounded_String)
@@ -30,5 +28,8 @@ package accounts is
 
    --  Used in AccountLogin procedure to verify if login was working.
    loginResult : accounts.userDataArray;
+
+   procedure saveData;
+   procedure AccountLogin;
 
 end accounts;
