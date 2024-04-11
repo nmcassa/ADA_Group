@@ -1,3 +1,4 @@
+with Ada.Characters.Handling; use Ada.Characters.Handling;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
 with GNAT.String_Split; use GNAT.String_Split;
@@ -164,5 +165,80 @@ package body accounts is
       end if;
 
    end saveData;
+
+   --  Procedure that executes the login/signup loop.
+   procedure AccountLogin is
+
+      Complete : Boolean := False;
+
+   begin
+
+      while not Complete loop
+
+         --  Prompts the user for their login
+         Put_Line ("Please enter your username and press enter.");
+
+         accounts.userData.Username := To_Unbounded_String
+           (Trim (Get_Line, Ada.Strings.Both));
+         New_Line;
+
+         Put_Line ("Please enter your password and press enter.");
+         accounts.userData.Password := To_Unbounded_String
+           (Trim (Get_Line, Ada.Strings.Both));
+         New_Line;
+
+         --  Calls the loadData function with the username and password
+         --  that was entered. loginResult holds the array of data
+         --  pulled from the file. Either it will actually hold the user's
+         --  playing record, or the first index will hold -777
+         --  meaning the user has a new account and there's no existing data
+         accounts.loginResult := accounts.loadData
+           (accounts.userData.Username,
+            accounts.userData.Password);
+
+         if accounts.loginResult (1) /= -777 then
+
+            Put_Line ("Welcome back, " & To_String
+                      (accounts.userData.Username) & "!");
+            accounts.userData.Wins := accounts.loginResult (1);
+            accounts.userData.Draws := accounts.loginResult (2);
+            accounts.userData.Losses := accounts.loginResult (3);
+            Put_Line ("Your game record is "
+                      & accounts.userData.Wins'Image & " -"
+                      & accounts.userData.Draws'Image
+                      & " -" & accounts.userData.Losses'Image &
+                        "!");
+
+            Complete := True;
+         else
+            --  Allows the user to create a login with the info they entered
+            --  or allows them to either re-enter a login or quit the game.
+
+            --  There's no built in escape sequence like \t so you
+            --  either have to create your own or use the ugly ASCII lib:sob:
+            Put_Line ("The login entered was not found.");
+            Put_Line ("Would you like to re-enter your login or sign up with" &
+                        " the current login?");
+
+            Put_Line (ASCII.HT &
+                        "Entered Username: "
+                      & To_String (accounts.userData.Username));
+
+            Put_Line (ASCII.HT &
+                        "Entered Password: "
+                      & To_String (accounts.userData.Password));
+            Put_Line ("Enter Y to create this account, N to retry login" &
+                     ", or Q to exit the game.");
+
+            if Ada.Characters.Handling.To_Lower (Get_Line) = "y" then
+               Complete := True;
+            elsif To_Lower (Get_Line) = "q" then
+               Put_Line ("Program terminating");
+               GNAT.OS_Lib.OS_Exit (0);
+            end if;
+
+         end if;
+      end loop;
+   end AccountLogin;
 
 end accounts;
