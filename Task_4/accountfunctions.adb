@@ -1,10 +1,10 @@
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Strings.Fixed; use Ada.Strings.Fixed;
-with Ada.Strings;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with GNAT.String_Split; use GNAT.String_Split;
 with Ada.Characters.Handling; use Ada.Characters.Handling;
 with GNAT.OS_Lib;
+with Ada.Strings;
 
 procedure Projecttwo is
 
