@@ -1,177 +1,185 @@
-with Ada.Text_IO;
-use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 procedure MAIN is
-	-- create an index for our board array from (0 - 8)
-	type Index is range 0 .. 8;
-	type Board is
-      	 array (Index) of Character;
+   --  create an index for our board array from (0 - 8)
+   type Index is range 0 .. 8;
+   type Board is array (Index) of Character;
 
-	B : Board := ('-', '-', '-',
-			 '-', '-', '-',
-			 '-', '-', '-');
-	type IntroBoard is
-	 array (Index) of Integer;
+   B : Board := ('-', '-', '-',
+                 '-', '-', '-',
+                '-', '-', '-');
+   
+   type IntroBoard is array (Index) of Integer;
 
-	Intro : IntroBoard := (0, 1, 2, 3, 4, 5, 6, 7, 8);
- 
+   Intro : constant IntroBoard := (0, 1, 2, 3, 4, 5, 6, 7, 8);
 
-	Temp : Integer;
+   Temp : Integer;
 
-	Winner : Character;
+   Winner : Character;
 
-	function IntroPrint(Intro : IntroBoard) return Integer
-	is 
-	begin
-		Ada.Text_IO.Put("When prompted, select the space you want to make your move.");
-		Ada.Text_IO.New_Line;
-		for I in Index loop
-			if I = 3 or I = 6 then
-				Ada.Text_IO.New_Line; 
-			end if;	
-			Ada.Text_IO.Put(Integer'Image(Intro(I)));
-		end loop;
-		Ada.Text_IO.New_Line;
-		return 1;
+   function IntroPrint (Intro : IntroBoard) return Integer
+   is
+   begin
+      Put_Line ("When prompted, select the space you want to make your move.");
+      for I in Index loop
+         if I = 3 or else I = 6 then
+            New_Line;
+         end if;
+         Put (Integer'Image (Intro (I)));
+      end loop;
+      New_Line;
+      return 1;
 
-	end IntroPrint;
+   end IntroPrint;
 
-	function DisplayBoard(B : Board) return Integer 
-	is
-	begin
-		for I in Index loop
-			if I = 3 or I = 6 then
-				Ada.Text_IO.New_Line; 
-			end if;	
-			Ada.Text_IO.Put(B(I));
-		end loop;
-		return 1;
-	end DisplayBoard;
+   function DisplayBoard (B : Board) return Integer
+   is
+   begin
+      for I in Index loop
+         if I = 3 or else I = 6 then
+            New_Line;
+         end if;
+         Put (B (I));
+      end loop;
+      return 1;
+   end DisplayBoard;
 
-	function PlayMove(B : out Board; I : Index; Player : Character) return Integer
-	is
-		Temp : Integer;
-		New_Move : Index;
-	begin
-		-- Error Check if I is outside of 0 .. 8
-		if B(I) = '-' then
-			B(I) := Player;
-			return 1;
-		end if;
-		Ada.Text_IO.New_Line;
-		Ada.Text_IO.Put("That space is already taken, select a new space: ");
-		New_Move := Index'Value(Ada.Text_IO.Get_Line);
-		Ada.Text_IO.New_Line;
-		Temp := PlayMove(B, New_Move, Player);
-		return 1;
-	end PlayMove;
-	
-	function CheckWin(B : Board; Player : Character) return Integer
-	is
-	begin
-		for I in 0 .. 2 loop
-			-- check rows
-			if B(Index(I * 3 + 0)) = Player and 
-			   B(Index(I * 3 + 1)) = Player and 
-			   B(Index(I * 3 + 2)) = Player then
-				return 1;
-			end if;
-			
-			-- check cols
-			if B(Index(0 * 3 + I)) = Player and
-			   B(Index(1 * 3 + I)) = Player and
-			   B(Index(2 * 3 + I)) = Player then
-				return 1;
-			end if;
-		end loop;
+   function PlayMove (B : out Board; I : Index; Player : Character)
+                      return Integer is
+      Temp : Integer;
+      New_Move : Index;
+   begin
+      --  Error Check if I is outside of 0 .. 8
+      if B (I) = '-' then
+         B (I) := Player;
+         return 1;
+      end if;
+      New_Line;
+      Put ("That space is already taken, select a new space: ");
+      New_Move := Index'Value (Get_Line);
+      New_Line;
+      Temp := PlayMove (B, New_Move, Player);
+      return 1;
+   end PlayMove;
 
-		-- check diag
-		if B(Index(0)) = Player and
-		   B(Index(4)) = Player and
-		   B(Index(8)) = Player then
-			return 1;
-		end if;
-		
-		-- check other diag
-		if B(Index(2)) = Player and
-		   B(Index(4)) = Player and
-		   B(Index(6)) = Player then
-			return 1;
-		end if;
+   function CheckWin (B : Board; Player : Character) return Integer
+   is
+   begin
+      for I in 0 .. 2 loop
+         --  check rows
+         if B (Index (I * 3 + 0)) = Player and then
+           B (Index (I * 3 + 1)) = Player and then
+           B (Index (I * 3 + 2)) = Player
+         then
+            
+            return 1;
+            
+         end if;
 
-		-- 0 if not winning board
-		return 0;
-	end CheckWin;
+         --  check cols
+         if B (Index (0 * 3 + I)) = Player and then
+           B (Index (1 * 3 + I)) = Player and then
+           B (Index (2 * 3 + I)) = Player
+         then
+            
+            return 1;
+            
+         end if;
+         
+      end loop;
 
-	function GameLoop (B : out Board) return Character
-	is
-		looping : Integer;
-		Move : Index;
-		Temp : Integer;
-	begin
-		looping := 1;
+      --  check diag
+      if B (Index (0)) = Player and then
+        B (Index (4)) = Player and then
+        B (Index (8)) = Player
+      then
+         
+         return 1;
+         
+      end if;
 
-		Ada.Text_IO.New_Line;
-		Temp := DisplayBoard(B);
-		Ada.Text_IO.New_Line;
-	
-		while looping = 1 loop
-			-- PlayerX's move
-			Ada.Text_IO.New_Line;
-			Ada.Text_IO.Put("Player X Make a Move: ");
+      --  check other diag
+      if B (Index (2)) = Player and then
+        B (Index (4)) = Player and then
+        B (Index (6)) = Player
+      then
+         
+         return 1;
+         
+      end if;
 
-			Move := Index'Value(Ada.Text_IO.Get_Line);			
-			Temp := PlayMove(B, Move, 'X');
+      --  0 if not winning board
+      return 0;
+   end CheckWin;
 
-			Ada.Text_IO.New_Line;
-			Temp := DisplayBoard(B);
-			Ada.Text_IO.New_Line;
+   function GameLoop (B : out Board) return Character
+   is
+      looping : Integer;
+      Move : Index;
+      Temp : Integer;
+   begin
+      looping := 1;
 
-			-- Check if X won
-			-- if X won, return X
-			if CheckWin(B, 'X') = 1 then
-				return 'X';	
-			end if;
+      New_Line;
+      Temp := DisplayBoard (B);
+      New_Line;
 
-			-- PlayerO's move
-			Ada.Text_IO.New_Line;
-			Ada.Text_IO.Put("Player O Make a Move: ");
+      while looping = 1 loop
+         --  PlayerX's move
+         New_Line;
+         Put ("Player X Make a Move: ");
 
-			Move := Index'Value(Ada.Text_IO.Get_Line);			
-			Temp := PlayMove(B, Move, 'O');
-			
-			if CheckWin(B, 'O') = 1 then
-				return 'O';	
-			end if;
+         Move := Index'Value (Get_Line);
+         Temp := PlayMove (B, Move, 'X');
 
-			Ada.Text_IO.New_Line;
-			Temp := DisplayBoard(B);
-			Ada.Text_IO.New_Line;
+         New_Line;
+         Temp := DisplayBoard (B);
+         New_Line;
 
-			-- Check if O won
+         --  Check if X won
+         --  if X won, return X
+         if CheckWin (B, 'X') = 1 then
+            return 'X';
+         end if;
 
-		end loop;
-		return 'X';
+         --  PlayerO's move
+         New_Line;
+         Put ("Player O Make a Move: ");
 
-	end GameLoop;
+         Move := Index'Value (Get_Line);
+         Temp := PlayMove (B, Move, 'O');
+
+         if CheckWin (B, 'O') = 1 then
+            return 'O';
+         end if;
+
+         New_Line;
+         Temp := DisplayBoard (B);
+         New_Line;
+
+         --  Check if O won
+
+      end loop;
+      return 'X';
+
+   end GameLoop;
 
 begin
-	Temp := IntroPrint(Intro);
-	Winner := GameLoop(B);	
+   Temp := IntroPrint (Intro);
+   Winner := GameLoop (B);
 
-	Ada.Text_IO.New_Line;
-	Temp := DisplayBoard(B);
-	Ada.Text_IO.New_Line;
+   New_Line;
+   Temp := DisplayBoard (B);
+   New_Line;
 
-	if Winner = 'X' then
-		Ada.Text_IO.New_Line;
-		Ada.Text_IO.Put("Player X won the game!");
-		Ada.Text_IO.New_Line;
-	end if;
+   if Winner = 'X' then
+      New_Line;
+      Put_Line ("Player X won the game!");
+   end if;
 
-	if Winner = 'O' then
-		Ada.Text_IO.New_Line;
-		Ada.Text_IO.Put("Player O won the game!");
-		Ada.Text_IO.New_Line;
-	end if;
+   if Winner = 'O' then
+      New_Line;
+      Put ("Player O won the game!");
+      New_Line;
+   end if;
 end MAIN;
