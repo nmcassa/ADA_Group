@@ -112,6 +112,19 @@ procedure MAIN is
       return 0;
    end CheckWin;
 
+   function CheckTie (B : Board) return Integer
+   is
+   begin
+
+      for I in 0 .. 8 loop
+         if B ( Index(I) ) = '-' then
+            return 0;
+         end if;
+      end loop;
+      return 1;
+
+   end CheckTie;
+
    function GameLoop (B : out Board) return Character
    is
       looping : Integer;
@@ -141,6 +154,11 @@ procedure MAIN is
          if CheckWin (B, 'X') = 1 then
             return 'X';
          end if;
+	
+         --  Check if tie 
+         if CheckTie(B) = 1 then 
+            return '-';
+         end if;
 
          --  PlayerO's move
          New_Line;
@@ -152,13 +170,16 @@ procedure MAIN is
          if CheckWin (B, 'O') = 1 then
             return 'O';
          end if;
+         
+         --  Check if tie 
+         if CheckTie(B) = 1 then 
+            return '-';
+         end if;
 
          New_Line;
          Temp := DisplayBoard (B);
          New_Line;
-
-         --  Check if O won
-
+         
       end loop;
       return 'X';
 
@@ -182,4 +203,11 @@ begin
       Put ("Player O won the game!");
       New_Line;
    end if;
+
+   if Winner = '-' then
+      New_Line;
+      Put ("No one wins");
+      New_Line;
+   end if;
+
 end MAIN;
