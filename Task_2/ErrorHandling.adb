@@ -1,11 +1,9 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
-
 procedure MAIN is
    --  create an index for our board array from (0 - 8)
    type Index is range 0 .. 8;
    type Board is array (Index) of Character;
-
 
    B : Board := ('-', '-', '-',
                  '-', '-', '-',
@@ -13,15 +11,11 @@ procedure MAIN is
    
    type IntroBoard is array (Index) of Integer;
 
-
    Intro : constant IntroBoard := (0, 1, 2, 3, 4, 5, 6, 7, 8);
-
 
    Temp : Integer;
 
-
    Winner : Character;
-
 
    function IntroPrint (Intro : IntroBoard) return Integer
    is
@@ -36,9 +30,7 @@ procedure MAIN is
       New_Line;
       return 1;
 
-
    end IntroPrint;
-
 
    function DisplayBoard (B : Board) return Integer
    is
@@ -52,39 +44,23 @@ procedure MAIN is
       return 1;
    end DisplayBoard;
 
-
-   function PlayMove(B: out Board; I: Index; Player: Character) return Integer is
-      New_Move: Index;
+   function PlayMove (B : out Board; I : Index; Player : Character)
+                      return Integer is
+      Temp : Integer;
+      New_Move : Index;
    begin
-      begin
-      --  Check if I is outside of 0 .. 8
-         if I not in Index'Range then
-         New_Line;
-         Put_Line("Invalid input. Please enter a number between 0 and 8.");
-         New_Line;
-         return 0;
-      elsif B(I) /= '-' then
-         New_Line;
-         Put_Line("That space is already taken. Please select a new space.");
-         New_Line;
-         return 0;
-      else
-         B(I) := Player;
+      --  Error Check if I is outside of 0 .. 8
+      if B (I) = '-' then
+         B (I) := Player;
          return 1;
       end if;
-
-
-      exception
-         when Constraint_Error =>
-            New_Line;
-            Put_Line("Invalid input. Please enter a number between 0 and 8.");
-            New_Line;
-            return 0; -- Ensure the function still returns to the game loop
-      end;
-end PlayMove;
-
-
-
+      New_Line;
+      Put ("That space is already taken, select a new space: ");
+      New_Move := Index'Value (Get_Line);
+      New_Line;
+      Temp := PlayMove (B, New_Move, Player);
+      return 1;
+   end PlayMove;
 
    function CheckWin (B : Board; Player : Character) return Integer
    is
@@ -95,24 +71,22 @@ end PlayMove;
            B (Index (I * 3 + 1)) = Player and then
            B (Index (I * 3 + 2)) = Player
          then
-           
+            
             return 1;
-           
+            
          end if;
-
 
          --  check cols
          if B (Index (0 * 3 + I)) = Player and then
            B (Index (1 * 3 + I)) = Player and then
            B (Index (2 * 3 + I)) = Player
          then
-           
+            
             return 1;
-           
+            
          end if;
          
       end loop;
-
 
       --  check diag
       if B (Index (0)) = Player and then
@@ -124,7 +98,6 @@ end PlayMove;
          
       end if;
 
-
       --  check other diag
       if B (Index (2)) = Player and then
         B (Index (4)) = Player and then
@@ -135,191 +108,99 @@ end PlayMove;
          
       end if;
 
-
       --  0 if not winning board
       return 0;
    end CheckWin;
-
 
    function CheckTie (B : Board) return Integer
    is
    begin
 
-
       for I in 0 .. 8 loop
-         if B ( Index(I) ) = '-' then
+         if B (Index (I)) = '-' then
             return 0;
          end if;
       end loop;
       return 1;
 
-
    end CheckTie;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-----------------------------------------------------------------
-   function GameLoop (B : out Board) return Character is
-   looping : Integer;
-   Move : Index;
-   Temp : Integer;
-begin
-   looping := 1;
-
-
-   New_Line;
-   Temp := DisplayBoard (B);
-   New_Line;
-
-
-   while looping = 1 loop
-      -- Player X's move
-      New_Line;
-      Put ("Player X Make a Move: ");
-
-
-      Move := Index'Value (Get_Line);
-      Temp := PlayMove (B, Move, 'X');
-
-
-      while Temp = 0 loop
-         New_Line;
-         Put ("Player X Make a Valid Move: ");
-         Move := Index'Value (Get_Line);
-         Temp := PlayMove (B, Move, 'X');
-      end loop;
-
+   function GameLoop (B : out Board) return Character
+   is
+      looping : Integer;
+      Move : Index;
+      Temp : Integer;
+   begin
+      looping := 1;
 
       New_Line;
       Temp := DisplayBoard (B);
       New_Line;
 
+      while looping = 1 loop
+         begin
+            --  PlayerX's move
+            New_Line;
+            Put ("Player X Make a Move: ");
 
-      -- Check if X won
-      if CheckWin (B, 'X') = 1 then
-         return 'X';
-      end if;
+            Move := Index'Value (Get_Line);
+            Temp := PlayMove (B, Move, 'X');
 
+            New_Line;
+            Temp := DisplayBoard (B);
+            New_Line;
 
-      -- Check if tie
-      if CheckTie(B) = 1 then
-         return '-';
-      end if;
+            --  Check if X won
+            --  if X won, return X
+            if CheckWin (B, 'X') = 1 then
+               return 'X';
+            end if;
+	
+            --  Check if tie 
+            if CheckTie (B) = 1 then 
+               return '-';
+            end if;
 
+            --  PlayerO's move
+            New_Line;
+            Put ("Player O Make a Move: ");
 
+            Move := Index'Value (Get_Line);
+            Temp := PlayMove (B, Move, 'O');
 
+            if CheckWin (B, 'O') = 1 then
+               return 'O';
+            end if;
+         
+            --  Check if tie 
+            if CheckTie (B) = 1 then 
+               return '-';
+            end if;
 
-
-
-
-
-      -- Player O's move
-      New_Line;
-      Put ("Player O Make a Move: ");
-
-
-      Move := Index'Value (Get_Line);
-      Temp := PlayMove (B, Move, 'O');
-
-
-      while Temp = 0 loop
-         New_Line;
-         Put ("Player O Make a Valid Move: ");
-         Move := Index'Value (Get_Line);
-         Temp := PlayMove (B, Move, 'O');
+            New_Line;
+            Temp := DisplayBoard (B);
+            New_Line;
+         exception
+            when Constraint_Error =>
+               Put_Line ("You entered an invalid input. Try again.");
+         end;
       end loop;
+      return 'X';
 
-
-      New_Line;
-      Temp := DisplayBoard (B);
-      New_Line;
-
-
-      if CheckWin (B, 'O') = 1 then
-         return 'O';
-      end if;
-
-
-      -- Check if tie
-      if CheckTie(B) = 1 then
-         return '-';
-      end if;
-
-
-     
-
-
-
-
-
-
-
-
-
-
-
-
-   end loop;
-
-
-   return 'X'; -- This line should never be reached
-exception
-   when Constraint_Error =>
-      New_Line;
-      Put_Line("Invalid input. Please enter a number between 0 and 8.");
-      New_Line;
-      return ','; -- Ensure the function still returns to the game loop
-end GameLoop;
-
-
-
-
-
-
-
-
-
+   end GameLoop;
 
 begin
-Temp := IntroPrint (Intro);
+   Temp := IntroPrint (Intro);
    Winner := GameLoop (B);
 
-
    New_Line;
    Temp := DisplayBoard (B);
    New_Line;
 
-
-    if Winner = 'X' then
+   if Winner = 'X' then
       New_Line;
       Put_Line ("Player X won the game!");
    end if;
-
 
    if Winner = 'O' then
       New_Line;
@@ -327,19 +208,10 @@ Temp := IntroPrint (Intro);
       New_Line;
    end if;
 
-
    if Winner = '-' then
       New_Line;
       Put ("No one wins");
       New_Line;
    end if;
-
-
-   if Winner = ',' then
-      New_Line;
-      Put ("Error. Restart.");
-      New_Line;
-   end if;
-
 
 end MAIN;
