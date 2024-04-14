@@ -66,11 +66,10 @@ package body accounts is
          when Name_Error =>
             Create (File, Out_File, "userData.txt");
             Put_Line (File, "Admin|12345|99|0|0");
-            Close (File);
             Put_Line ("Data file did not exist. New file created.");
             New_Line;
-            Put_Line ("Program terminating. Please Restart.");
-            GNAT.OS_Lib.OS_Exit (0);
+            dataResult (1) := -776;
+            fileLinePosition := -1;
 
             --  Any other error thrown will be from attempting to read
             --  and parse existing data, so it's likely the data file was
@@ -79,7 +78,7 @@ package body accounts is
             Put_Line ("There was an error reading data from the file." &
                         " File may be corrupted.");
             Put_Line ("Program terminating." &
-              "Please check data file and restart.");
+                        "Please check data file and restart.");
             GNAT.OS_Lib.OS_Exit (0);
       end;
 
@@ -140,10 +139,10 @@ package body accounts is
             if fileLineCounter /= accounts.fileLinePosition then
                Put_Line (File, Get_Line (TempFile));
 
-            --  If the current line in tempfile is the same line as
-            --  the current user's data, it writes their data stored
-            --  in the data record to file, and then skips the line in
-            --  tempfile to avoid having a dupe of the data line.
+               --  If the current line in tempfile is the same line as
+               --  the current user's data, it writes their data stored
+               --  in the data record to file, and then skips the line in
+               --  tempfile to avoid having a dupe of the data line.
             elsif fileLineCounter = accounts.fileLinePosition then
                Put_Line (File, To_String (userData.Username) & "|" &
                            To_String (userData.Password) & "|" &
@@ -196,27 +195,30 @@ package body accounts is
            (accounts.userData.Username,
             accounts.userData.Password);
 
-         if accounts.loginResult (1) /= -777 then
+         if accounts.loginResult (1) = -776 then
+            Put_Line ("The following information is your account login data.");
 
-            Put_Line ("Welcome back, " & To_String
-                      (accounts.userData.Username) & "!");
-            accounts.userData.Wins := accounts.loginResult (1);
-            accounts.userData.Draws := accounts.loginResult (2);
-            accounts.userData.Losses := accounts.loginResult (3);
-            Put_Line ("Your game record is "
-                      & accounts.userData.Wins'Image & " -"
-                      & accounts.userData.Draws'Image
-                      & " -" & accounts.userData.Losses'Image &
-                        "!");
+            Put_Line (ASCII.HT &
+                        "Entered Username: "
+                      & To_String (accounts.userData.Username));
 
+            Put_Line (ASCII.HT &
+                        "Entered Password: "
+                      & To_String (accounts.userData.Password));
             Complete := True;
-         else
+            New_Line;
+
+            Put_Line ("Hit Enter to continue.");
+            Put (Get_Line);
+
+         elsif accounts.loginResult (1) = -777 then
             --  Allows the user to create a login with the info they entered
             --  or allows them to either re-enter a login or quit the game.
 
             --  There's no built in escape sequence like \t so you
             --  either have to create your own or use the ugly ASCII lib:sob:
             Put_Line ("The login entered was not found.");
+
             Put_Line ("Would you like to re-enter your login or sign up with" &
                         " the current login?");
 
@@ -228,7 +230,7 @@ package body accounts is
                         "Entered Password: "
                       & To_String (accounts.userData.Password));
             Put_Line ("Enter Y to create this account, N to retry login" &
-                     ", or Q to exit the game.");
+                        ", or Q to exit the game.");
 
             if Ada.Characters.Handling.To_Lower (Get_Line) = "y" then
                Complete := True;
@@ -236,6 +238,22 @@ package body accounts is
                Put_Line ("Program terminating");
                GNAT.OS_Lib.OS_Exit (0);
             end if;
+
+         elsif accounts.loginResult (1) /= -777 then
+
+            Put_Line ("Welcome back, " & To_String
+                      (accounts.userData.Username) & "!");
+            accounts.userData.Wins := accounts.loginResult (1);
+            accounts.userData.Draws := accounts.loginResult (2);
+            accounts.userData.Losses := accounts.loginResult (3);
+            Put_Line ("Your game record is "
+                      & accounts.userData.Wins'Image & " -"
+                      & accounts.userData.Draws'Image
+                      & " -" & accounts.userData.Losses'Image &
+                        "!");
+            Put_Line ("Hit Enter to continue.");
+            Put (Get_Line);
+            Complete := True;
 
          end if;
       end loop;
